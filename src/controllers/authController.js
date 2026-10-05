@@ -6,7 +6,13 @@ const jwt = require("jsonwebtoken");
 
 async function registerUser(req, res) {
     try {
-        const { name, email, password, role } = req.body || {};
+        const { name, email, password } = req.body || {};
+
+        if (Object.prototype.hasOwnProperty.call(req.body || {}, "role")) {
+            return res.status(403).json({
+                message: "Role cannot be set during public registration"
+            });
+        }
 
         if (!name || !email || !password) {
             return res.status(400).json({
@@ -32,7 +38,7 @@ async function registerUser(req, res) {
             name,
             email: normalizedEmail,
             password: hashedPassword,
-            role: role || "storeOwner"
+            role: "storeOwner"
         });
 
         const token = jwt.sign(

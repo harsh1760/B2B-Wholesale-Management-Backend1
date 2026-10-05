@@ -151,11 +151,19 @@ const updateUserRole = async (req, res) => {
     try {
 
         const { role } = req.body;
+        const allowedRoles = ["admin", "storeOwner"];
+
+        if (!allowedRoles.includes(role)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid role"
+            });
+        }
 
         const user = await User.findByIdAndUpdate(
             req.params.id,
             { role },
-            { new: true }
+            { new: true, runValidators: true }
         ).select("-password");
 
         if (!user) {
